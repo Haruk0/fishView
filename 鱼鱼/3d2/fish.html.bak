@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 a_Position;
+attribute vec3 normal;
+attribute vec4 a_Color;
+attribute vec4 lightPosition;
+
+uniform mat4 u_MVPMatrix;//模型视图矩阵
+varying vec4 passPosition;
+varying vec3 v_normal;
+varying vec4 fColor;
+varying vec4 passlightPosition;
+
+void main()
+{
+	gl_Position=u_MVPMatrix*a_Position;
+    //passPosition=u_MVPMatrix*a_Position;
+	passPosition=a_Position;
+    v_normal=normal;
+    fColor = a_Color;
+	passlightPosition=lightPosition;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision highp float;
+
+uniform vec4 ambientProduct;
+uniform vec4 bodyUpDiffuseProduct;
+uniform vec4 bodyDownDiffuseProduct;
+uniform vec4 headDiffuseProduct;
+uniform vec4 specularProduct;
+uniform float shininess;
+
+varying vec4 passlightPosition;
+varying vec4 fColor;
+varying vec4 passPosition;
+varying vec3 v_normal;
+
+void main()
+{
+    float light=max(dot(normalize(passPosition.xyz-passlightPosition.xyz),v_normal),0.0);
+	//float light=dot(normalize(lightPosition.xyz-passPosition.xyz),v_normal);
+    //float light=0.5;
+    vec4 cColor;
+
+    vec4 ambient = ambientProduct;
+    vec4  diffuse ;
+
+    diffuse= light*fColor;
+ 
+
+    //float Ks = pow( max(dot(N, H), 0.0), shininess );
+    //vec4  specular = Ks * specularProduct;   
+    //if( dot(L, N) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
+
+    cColor =  ambient+diffuse ;//+specular;
+    cColor.a = 1.0;
+
+    gl_FragColor = cColor;//
+}
+</script>
+
+<script type="text/javascript" src="../Common/cuon-matrix.js"></script>
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="fish.js"></script>
+</head>
+
+<body>
+<div>
+光源位置  x -2 <input id="sliderx" type="range"
+ min= "-20.0" max= "20" step = "2" value = "10" />
+ 2
+</div>
+<div>
+光源位置  y -2 <input id="slidery" type="range"
+ min= "-20" max= "20" step = "2" value = "10" />
+ 2
+</div>
+<div>
+光源位置  z -2 <input id="sliderz" type="range"
+ min= "-20" max= "20" step = "2" value = "10" />
+ 2
+</div>
+<canvas id="gl-canvas" width="1024" height="1024">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>
